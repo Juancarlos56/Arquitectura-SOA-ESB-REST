@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9b2c689e-73bb-4f87-8d4d-fff346700df4" basePath="servicios" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="arquitecturasoa-esb-web-servicesFlow" doc:id="49d6f636-0105-4023-81ca-4a4118547b8e" >
+		<http:listener doc:name="Inicio App Listener" doc:id="7a095639-7ba3-483b-acf4-7011ea1c0f90" config-ref="HTTP_Listener_config" path="getInformacionBanco" allowedMethods="GET">
+			<ee:repeatable-file-store-stream bufferUnit="MB" />
+		</http:listener>
+		<logger level="INFO" doc:name="Entrada de Logger" doc:id="aad1bddb-9fb9-4b39-a866-7e5d360bcc0e" message="Prueba de mule funcionando.... "/>
+	</flow>
+</mule>
