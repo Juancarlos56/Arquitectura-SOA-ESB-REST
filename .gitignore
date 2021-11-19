@@ -1,12 +1,9 @@
 # ------------------------------------------------------------------------------ #
 # Java defaults (https://github.com/github/gitignore/blob/master/Java.gitignore) #
 # ------------------------------------------------------------------------------ #
-*.class
 
 # Package Files #
-*.jar
-*.war
-*.ear
+
 
 # ------------------------------------------------------------------------------------------- #
 # Eclipse-specific (https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore) #
@@ -33,10 +30,9 @@ local.properties
 *.launch
 
 # CDT-specific
-.cproject
 
 # PDT-specific
-.buildpath
+
 
 # --------------- #
 # Studio-specific #
