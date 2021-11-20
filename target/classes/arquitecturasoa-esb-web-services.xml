@@ -12,7 +12,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<http:listener doc:name="Inicio App Listener" doc:id="7a095639-7ba3-483b-acf4-7011ea1c0f90" config-ref="HTTP_Listener_config" path="getInformacionBanco" allowedMethods="GET">
 			<ee:repeatable-file-store-stream bufferUnit="MB" />
 		</http:listener>
-		<http:request method="GET" doc:name="Request" doc:id="8083c16a-aeb8-4ee9-895b-2894c165599f" />
 		<logger level="INFO" doc:name="Entrada de Logger" doc:id="aad1bddb-9fb9-4b39-a866-7e5d360bcc0e" message="Prueba de mule funcionando.... "/>
 	</flow>
 </mule>
