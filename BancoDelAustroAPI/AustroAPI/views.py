@@ -22,7 +22,26 @@ class AllTransferenciasCuentasViewSet(viewsets.ModelViewSet):
   queryset = Cuenta.objects.all()
   serializer_class = AllTransferenciasCuentasSerializer  
 
-
+class buscarCuentasCuentaViews(APIView):
+    def post(self, request):
+      cedulaCliente = request.data.get('cuenta')
+      if cedulaCliente!= "":
+        
+        with connection.cursor() as cursor:
+          query = '''SELECT *
+                    FROM AustroAPI_cuenta c 
+                    WHERE 
+                          c.numeroCuenta=%s
+                  '''
+          cursor.execute(query,[cedulaCliente])
+          #fetchall es para listas cursor.fetchall()
+          #fetchone es para tomar el ultimo registro 
+          registros = cursor.fetchone()
+        jsonCuenta = {"cedulaCliente": registros[1], "nombreCompletoCliente": registros[2], "numeroCuenta": registros[3], "montoCuenta": registros[4]}
+        serializer = CuentaSerializer(jsonCuenta)
+        return Response(serializer.data, status=status.HTTP_200_OK) 
+      else:
+        return Response({"status": "error", "data: ": cedulaCliente}, status=status.HTTP_400_BAD_REQUEST)
 
 class buscarCuentasCedulaViews(APIView):
     def post(self, request):
@@ -44,7 +63,29 @@ class buscarCuentasCedulaViews(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK) 
       else:
         return Response({"status": "error", "data: ": cedulaCliente}, status=status.HTTP_400_BAD_REQUEST)
-      
+
+class actualizarMontoCuentaUsuarioNumeroCuenta(APIView):
+    def post(self, request):
+      cedulaCliente = request.data.get('cuenta')
+      montoCuenta = 0
+      try: 
+        montoCuenta = float(request.data.get('monto'))
+      except:
+          return Response({"status": "error monto mal ingresado"}, status=status.HTTP_400_BAD_REQUEST)
+      print(">>>>>>>>>>>>>>>>>>>>>>",montoCuenta)
+      if cedulaCliente!= "" and montoCuenta > 0.0:
+        
+        with connection.cursor() as cursor:
+          query = '''UPDATE AustroAPI_cuenta 
+                      SET montoCuenta = %s
+                      WHERE 
+                          numeroCuenta=%s
+                  '''
+          cursor.execute(query,[montoCuenta,cedulaCliente])
+          
+        return Response({"status":"Registro Actualizado"},status=status.HTTP_200_OK) 
+      else:
+        return Response({"status": "error cedula mal ingresada o monto inferior a 0"}, status=status.HTTP_400_BAD_REQUEST)     
 
 class actualizarMontoCuentaUsuario(APIView):
     def post(self, request):
