@@ -1,0 +1,7 @@
+{
+  "name": "interfaz_practica_sistemas_distribuidos_esb_soa",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

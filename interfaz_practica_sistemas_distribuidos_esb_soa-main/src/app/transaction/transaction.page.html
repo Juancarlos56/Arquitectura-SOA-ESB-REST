@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Transacción</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list lines="full" class="ion-no-margin">
+    <ion-list-header lines="full">
+      <ion-label>
+        Realice su transacción
+      </ion-label>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-label position="fixed">Monto</ion-label>
+      <ion-input [(ngModel)]="monto" placeholder="00.00"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="fixed">Beneficiario</ion-label>
+      <ion-input [(ngModel)]="cedula" placeholder="Cedula..."></ion-input>
+      <ion-input [(ngModel)]="cuentaCl" placeholder="Cuenta..."></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Banco</ion-label>
+      <ion-select (ionChange)="getBank($event)"  interface="popover">
+        <ion-select-option value="1">Banco del Austro</ion-select-option>
+        <ion-select-option value="2">Banco Pichincha</ion-select-option>
+        
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="fixed">Cuenta</ion-label>
+      <ion-input [(ngModel)]="cuenta" placeholder="Numero de Cuenta..."></ion-input>
+    </ion-item>
+
+    
+
+    <section>
+      <ion-button (click)='makeTransaction()' expand="block">Realizar Transaccion</ion-button>
+    </section>
+
+  </ion-list>
+
+ 
+
+</ion-content>
