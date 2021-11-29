@@ -15,6 +15,6 @@ urlpatterns = [
     path('api/buscarCuenta/', buscarCuentasCuentaViews.as_view()),
     path('api/actulizarMontoCuenta/', actualizarMontoCuentaUsuario.as_view()),
     path('api/crearTransferenciaCuenta/', crearTransferenciaCuenta.as_view()),
-     path('api/actulizarMontoCuentaNumeroCuenta/', actualizarMontoCuentaUsuarioNumeroCuenta.as_view()),
+    path('api/actulizarMontoCuentaNumeroCuenta/', actualizarMontoCuentaUsuarioNumeroCuenta.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
