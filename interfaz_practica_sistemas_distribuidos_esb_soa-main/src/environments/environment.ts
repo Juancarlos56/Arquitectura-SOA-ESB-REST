@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
 
-  WS_PATH: "http://localhost:8081/servicios/getInformacionBanco"
+  WS_PATH: "http://127.0.0.1:8000/api/"
 };
 
 /*

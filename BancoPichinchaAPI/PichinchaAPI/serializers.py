@@ -26,3 +26,9 @@ class AllTransferenciasCuentasSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Cuenta
         fields = ('cedulaCliente', 'nombreCompletoCliente', 'numeroCuenta','montoCuenta','cuentasTransferencia')
+
+
+class TransaccionSerializerObjects(serializers.ModelSerializer): 
+    class Meta: 
+        model = Transferencia
+        fields = '__all__'

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { alertController } from '@ionic/core';
-import { RequestESB } from '../class/request';
+import { Deposito } from '../class/request';
 import { ESBserviceService } from '../services/esbservice.service';
 
 @Component({
@@ -10,14 +10,13 @@ import { ESBserviceService } from '../services/esbservice.service';
 })
 export class TransactionPage implements OnInit {
 
-  private bankInfo: any
-  private aux = new RequestESB()
+  private deposito = new Deposito()
   private bank: any
   private response: any
   
-  cedula: string
-  cuentaCl: string
-  cuenta: string
+  cedulaBeneficiario: string
+  cuentaBeneficiario: string
+  cedulaDepositante: string
   monto: string
 
   constructor(private esbService : ESBserviceService) { 
@@ -30,23 +29,17 @@ export class TransactionPage implements OnInit {
     
   }
 
-  getBank($event) {
-    this.bank = Number($event.target.value)
-    console.log("BANK>> "+this.bank+" CEDULA>> "+this.cedula)    
-  }
-
   async makeTransaction() {
-    this.aux.id = this.bank
-    this.aux.cedula = this.cedula
-    this.aux.cuentaCl = this.cuentaCl
-    this.aux.cuenta = this.cuenta
-    this.aux.monto = Number(this.monto)
 
-    if(this.cedula && this.cuenta && this.cuentaCl && this.monto && this.bank){
+    this.deposito.cedulaBeneficiario = this.cedulaBeneficiario
+    this.deposito.cuentaBeneficiario = this.cuentaBeneficiario
+    this.deposito.cedulaDepositante = this.cedulaDepositante
+    this.deposito.monto = Number(this.monto)
+
+    if((this.cedulaBeneficiario != this.cedulaDepositante)){
       console.log("YES IT IS!")
-      console.log("BANK>> "+this.bank+" CEDULA>> "+this.cedula)
-      
-      this.esbService.startTransaction(this.aux).subscribe(async (items) => {
+     
+      this.esbService.startTransaction(this.deposito).subscribe(async (items) => {
         
         this.response = items
         console.log( this.response );
@@ -54,7 +47,7 @@ export class TransactionPage implements OnInit {
         try {
           const alert = await alertController.create({
             header: this.response.status,
-            message: 'BITCOIN: '+this.response.bitcoin,
+            message: 'Deposito: '+this.response.status,
             buttons: ['OK']
           });
           await alert.present();

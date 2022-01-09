@@ -1,3 +1,4 @@
+import decimal
 from django.shortcuts import render
 from .models import * 
 from .serializers import * 
@@ -7,7 +8,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
 import json
-  
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import permissions
+from decimal import * 
+
 class CuentaViewSet(viewsets.ModelViewSet):
   queryset = Cuenta.objects.all()
   serializer_class = CuentaSerializer
@@ -22,120 +26,63 @@ class AllTransferenciasCuentasViewSet(viewsets.ModelViewSet):
   queryset = Cuenta.objects.all()
   serializer_class = AllTransferenciasCuentasSerializer  
 
-class buscarCuentasCuentaViews(APIView):
-    def post(self, request):
-      cedulaCliente = request.data.get('cuenta')
-      if cedulaCliente!= "":
-        
-        with connection.cursor() as cursor:
-          query = '''SELECT *
-                    FROM PichinchaAPI_cuenta c 
-                    WHERE 
-                          c.numeroCuenta=%s
-                  '''
-          cursor.execute(query,[cedulaCliente])
-          #fetchall es para listas cursor.fetchall()
-          #fetchone es para tomar el ultimo registro 
-          registros = cursor.fetchone()
-        jsonCuenta = {"cedulaCliente": registros[1], "nombreCompletoCliente": registros[2], "numeroCuenta": registros[3], "montoCuenta": registros[4]}
-        serializer = CuentaSerializer(jsonCuenta)
-        return Response(serializer.data, status=status.HTTP_200_OK) 
-      else:
-        return Response({"status": "error", "data: ": cedulaCliente}, status=status.HTTP_400_BAD_REQUEST)
 
-class buscarCuentasCedulaViews(APIView):
-    def post(self, request):
-      cedulaCliente = request.data.get('cedula')
-      if cedulaCliente!= "":
-        
-        with connection.cursor() as cursor:
-          query = '''SELECT *
-                    FROM PichinchaAPI_cuenta c 
-                    WHERE 
-                          c.cedulaCliente=%s
-                  '''
-          cursor.execute(query,[cedulaCliente])
-          #fetchall es para listas cursor.fetchall()
-          #fetchone es para tomar el ultimo registro 
-          registros = cursor.fetchone()
-        jsonCuenta = {"cedulaCliente": registros[1], "nombreCompletoCliente": registros[2], "numeroCuenta": registros[3], "montoCuenta": registros[4]}
-        serializer = CuentaSerializer(jsonCuenta)
-        return Response(serializer.data, status=status.HTTP_200_OK) 
-      else:
-        return Response({"status": "error", "data: ": cedulaCliente}, status=status.HTTP_400_BAD_REQUEST)
 
-class actualizarMontoCuentaUsuarioNumeroCuenta(APIView):
-    def post(self, request):
-      cedulaCliente = request.data.get('cuenta')
-      montoCuenta = 0
-      try: 
-        montoCuenta = float(request.data.get('monto'))
-      except:
-          return Response({"status": "error monto mal ingresado"}, status=status.HTTP_400_BAD_REQUEST)
-      print(">>>>>>>>>>>>>>>>>>>>>>",montoCuenta)
-      if cedulaCliente!= "" and montoCuenta > 0.0:
-        
-        with connection.cursor() as cursor:
-          query = '''UPDATE PichinchaAPI_cuenta 
-                      SET montoCuenta = %s
-                      WHERE 
-                          numeroCuenta=%s
-                  '''
-          cursor.execute(query,[montoCuenta,cedulaCliente])
-          
-        return Response({"status":"Registro Actualizado"},status=status.HTTP_200_OK) 
-      else:
-        return Response({"status": "error cedula mal ingresada o monto inferior a 0"}, status=status.HTTP_400_BAD_REQUEST)         
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def crearTransferenciaCuenta(request):
+  
+  cedulaBeneficiario = request.data.get('cedulaBeneficiario')
+  cuentaBeneficiario = request.data.get('cuentaBeneficiario')
+  cedulaDepositante = request.data.get('cedulaDepositante')
+  monto = 0.0
+  try: 
+    monto = float(request.data.get('monto'))
+  except:
+      return Response({"status": "error monto mal ingresado"}, status=status.HTTP_400_BAD_REQUEST)
 
-class actualizarMontoCuentaUsuario(APIView):
-    def post(self, request):
-      cedulaCliente = request.data.get('cedula')
-      montoCuenta = 0
-      try: 
-        montoCuenta = float(request.data.get('monto'))
-      except:
-          return Response({"status": "error monto mal ingresado"}, status=status.HTTP_400_BAD_REQUEST)
-      print(">>>>>>>>>>>>>>>>>>>>>>",montoCuenta)
-      if cedulaCliente!= "" and montoCuenta > 0.0:
-        
-        with connection.cursor() as cursor:
-          query = '''UPDATE PichinchaAPI_cuenta 
-                      SET montoCuenta = %s
-                      WHERE 
-                          cedulaCliente=%s
-                  '''
-          cursor.execute(query,[montoCuenta,cedulaCliente])
-          
-        return Response({"status":"Registro Actualizado"},status=status.HTTP_200_OK) 
-      else:
-        return Response({"status": "error cedula mal ingresada o monto inferior a 0"}, status=status.HTTP_400_BAD_REQUEST)
+  if cedulaBeneficiario!= "" and monto > 0.0 and cedulaDepositante != "":
+    print("= cedulaBeneficiario",cedulaBeneficiario, " = ",cuentaBeneficiario)
+    benefiario = 0
+    try: 
+      benefiario = Cuenta.objects.get(cedulaCliente=cedulaBeneficiario, numeroCuenta = cuentaBeneficiario) 
+      depositante = Cuenta.objects.get(cedulaCliente=cedulaDepositante)  
 
-class crearTransferenciaCuenta(APIView):
-    def post(self, request):
-      cedulaCliente = request.data.get('cedula')
-      montoCuenta = 0
-      tipoTransferencia = request.data.get('tipoTransferencia')
-      try: 
-        montoCuenta = float(request.data.get('monto'))
-      except:
-          return Response({"status": "error monto mal ingresado"}, status=status.HTTP_400_BAD_REQUEST)
+    except: 
+      print("Error en busqueda de cedula en benefiario o depositante")
+      return Response(status=status.HTTP_404_NOT_FOUND) 
     
-      if cedulaCliente!= "" and montoCuenta > 0.0:
+    if benefiario.montoCuenta > 0 and  benefiario.montoCuenta > monto:
+      
+    
+      transaccionRetiroRegistrar = {
+        'montoTransferencia' : ((-1)*(monto)),
+        'tipoTransferencia' : "retiro",
+        'cuenta' : depositante.id
+      }
+      
+      transaccionDepositoRegistrar = {
+        'montoTransferencia' : monto,
+        'tipoTransferencia' : "deposito",
+        'cuenta' : benefiario.id
+      }
+      
+      transaccionRetiroRegistrar_serializer = TransaccionSerializerObjects(data=transaccionRetiroRegistrar)
+      transaccionDepositoRegistrar_serializer = TransaccionSerializerObjects(data=transaccionDepositoRegistrar)
+      
+      if transaccionRetiroRegistrar_serializer.is_valid() == True and transaccionDepositoRegistrar_serializer.is_valid() == True:
+        transaccionRetiroRegistrar_serializer.save()
+        transaccionDepositoRegistrar_serializer.save()
+        benefiario.montoCuenta = benefiario.montoCuenta + decimal.Decimal(monto)
+        depositante.montoCuenta = depositante.montoCuenta - decimal.Decimal(monto)
         
-        with connection.cursor() as cursor:
-          query = '''SELECT c.id
-                    FROM PichinchaAPI_cuenta c 
-                    WHERE 
-                          c.cedulaCliente=%s
-                  '''
-          cursor.execute(query,[cedulaCliente])
-          idCuenta = cursor.fetchone()
-          print(idCuenta)
-          query = '''INSERT INTO PichinchaAPI_transferencia (montoTransferencia,tipoTransferencia,cuenta_id) 
-                      VALUES (%s, %s, %s)
-                  '''
-          cursor.execute(query,[montoCuenta, tipoTransferencia, idCuenta[0]])
-         
+        benefiario.save()
+        depositante.save()
+        
         return Response({"status":"Transferencia Realizada"},status=status.HTTP_200_OK) 
-      else:
-        return Response({"status": "error cedula mal ingresada o monto inferior a 0"}, status=status.HTTP_400_BAD_REQUEST)
+  
+      return Response(transaccionRetiroRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response({"status": "No cuenta con dinero"}, status=status.HTTP_400_BAD_REQUEST)
+  else:
+    return Response({"status": "error cedula mal ingresada o monto inferior a 0"}, status=status.HTTP_400_BAD_REQUEST)
